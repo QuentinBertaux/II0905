@@ -45,7 +45,6 @@ void main (void)
     
     SYSTEM_Initialize();
 	uartInitialize(); 
-    
     uartPrint("Début");
     while(1)
     {
