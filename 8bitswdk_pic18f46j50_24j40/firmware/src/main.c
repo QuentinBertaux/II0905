@@ -37,19 +37,22 @@ void main (void)
 {
     char chn[]="";
     uint8_t detect;
+    bool wake;
     
     SYSTEM_Initialize();
 	uartInitialize(); 
     
     MiApp_ProtocolInit(false);
-    MiApp_SetChannel(12);
-    MiApp_StartConnection(1, 10, 12);
-    detect = MiApp_SearchConnection(12,1);
+    MiApp_SetChannel(11);
+    detect = MiApp_SearchConnection(12,0X1L<<11);
 
-    if(!detect) MiApp_EstablishConnection(0xFF, CONN_MODE_INDIRECT);
+    if(detect == 0) MiApp_StartConnection(START_CONN_DIRECT, 10, 0xFF);
      
     while(1)
     {
+        MiApp_FlushTx();
+        MiApp_WriteData(0x63);
+        MiApp_MessageAvailable();
         if(uartIsChar()) 
         {
             uartRead();
