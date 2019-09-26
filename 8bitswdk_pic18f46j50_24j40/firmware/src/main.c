@@ -31,27 +31,27 @@ extern API_UINT16_UNION                 myPANID;        						// mon PANID
 extern uint8_t                          myLongAddress[MY_ADDRESS_LENGTH];		// mon adresse IEEE
 extern API_UINT16_UNION                 myShortAddress;                     	// mon adresse logique
 extern ACTIVE_SCAN_RESULT               ActiveScanResults[ACTIVE_SCAN_RESULT_SIZE];		// table des actives scan
-
-
-
 extern RECEIVED_MESSAGE  rxMessage;
-
-
-
 
 void main (void)
 {
-    //char chn[];
+    char chn[]="";
+    uint8_t detect;
     
     SYSTEM_Initialize();
 	uartInitialize(); 
     
-    uartPrint("Début");
+    MiApp_ProtocolInit(false);
+    MiApp_SetChannel(12);
+    MiApp_StartConnection(1, 10, 12);
+    detect = MiApp_SearchConnection(12,1);
+
+    if(!detect) MiApp_EstablishConnection(0xFF, CONN_MODE_INDIRECT);
+     
     while(1)
     {
         if(uartIsChar()) 
         {
-            uartPrint("Test");
             uartRead();
         }
     }
