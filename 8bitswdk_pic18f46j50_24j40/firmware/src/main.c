@@ -3,27 +3,16 @@
  *
  * Nom binôme : SHAITA Yanis / BERTAUX Quentin
  *
- * Version : 0.000.000
+ * Version : 0.500.000
  *
  */
-
-
-
-
-
-
 /************************ HEADERS ****************************************/
 #include "VT100.h"
 #include "system.h"
 #include "system_config.h"
 #include "miwi/miwi_api.h"
 
-
 /************************** PROTOTYPES ************************************/
-
-
-
-
 
 /************************** VARIABLES ************************************/
         
@@ -35,28 +24,40 @@ extern RECEIVED_MESSAGE  rxMessage;
 
 void main (void)
 {
-    char chn[]="";
-    uint8_t detect;
-    bool wake;
+    //char chn[]="Reception";
+    uint8_t dtct;
+    //bool wake;
     
+    //Initialisation système & UART
     SYSTEM_Initialize();
 	uartInitialize(); 
-    
+    //Initialisation MiWi
     MiApp_ProtocolInit(false);
-    MiApp_SetChannel(11);
-    detect = MiApp_SearchConnection(12,0X1L<<11);
+    MiApp_SetChannel(15);
+    
+    //Procédure de connexion
+    dtct = MiApp_SearchConnection(10,0xFFFF);
 
-    if(detect == 0) MiApp_StartConnection(START_CONN_DIRECT, 10, 0xFF);
-     
+    if(dtct == 0) 
+    {
+        MiApp_StartConnection(START_CONN_DIRECT, 0, 0);
+       uartPrint("Pas de PAN, creation");
+    }
+    else
+    {
+        MiApp_EstablishConnection(0xFF, CONN_MODE_INDIRECT);
+       uartPrint("PAN trouve");
+    }
+    
+    //Fin de connexion
+   // CleanScreen();
+    
     while(1)
     {
         MiApp_FlushTx();
-        MiApp_WriteData(0x63);
-        MiApp_MessageAvailable();
-        if(uartIsChar()) 
-        {
-            uartRead();
-        }
-    }
+        MiApp_WriteData(0xDD);
+        MiApp_BroadcastPacket(false);
         
+        if(uartIsChar()) uartPrint(rxMessage.Payload);
+    }    
 }
